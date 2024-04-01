@@ -7,44 +7,60 @@ d3.json(samples_url).then(function(data) {
 
 // save all available ids
 let ids = data.names
+console.log(ids)
 
-// when subject id dropdown is changed, call function
-d3.selectAll("#selDataset").on("change", optionChanged);
+//create a dropdown variable to provide the id options
+let dropDown = d3.select("#selDataset");
+
+//the following code was made using the following sources: https://stackoverflow.com/questions/20780835/putting-the-country-on-drop-down-list-using-d3-via-csv-file,
+    //https://www.tutorialsteacher.com/d3js/data-binding-in-d3js, and BootcampSpot: Xpert Learning Assistant
+
+//provide an array of ids to populate
+dropDown.selectAll("option").data(ids).enter().append("option")
+.attr("value", function(id) {return id; })
+.text(function(id) {return id; });
 
 function optionChanged() {
-    let dropdownMenu = d3.select("#selDataset");
-    let choice = d3.select(this.ids);
+    //access the selected value from the dropdown menu
+    let choice = dropDown.property("value");
+    console.log("Selected value: ", choice);
+}
+
+// when subject id dropdown is changed, call function
+dropDown.on("change", optionChanged);
+
+});
 
 // i need 'this' to be the chosen id value from the list of available ids
 
 //access the "sample" portion of the json
-let sample_data = data.samples
+//let sample_data = choice.samples
 
 //sort by from biggest to smallest OTU based on sample value
-let sortedSampleData = sample_data.sort((a, b) => b.sample_values - a.sample_values);
+//let sortedSampleData = sample_data.sort((a, b) => b.sample_values - a.sample_values);
 
 //Choose only the top 10 OTUs
-let topTen = sortedSampleData.slice(0,10);
+//let topTen = sortedSampleData.slice(0,10);
 
 //console log to check that the top 10 were correctly selected
-console.log(topTen);
+//console.log(topTen);
 
 //Set up trace for bar chart
-trace1 = {
-    x: topTen.sample_values,
-    y: topTen.otu_ids,
-    type: "bar",
-    orientation: "h"
-};
+//trace1 = {
+//    x: topTen.sample_values,
+ //   y: topTen.otu_ids,
+   // type: "bar",
+    //orientation: "h"
+//};
 
-let barData = [trace1];
+//let barData = [trace1];
 
-Plotly.newPlot("bar", barData);
+//Plotly.newPlot("bar", barData);
 
-console.log(id)
+//console.log(id)
 
-    }
+    //}
 
-});
+//});
 
 
