@@ -3,13 +3,12 @@ const samples_url = "https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/sampl
 
 // Use d3.json to read in the data
 dataAccess = d3.json(samples_url)
+    console.log(dataAccess)
 
 //populate dropdown menu and populate charts with results from an id
 function dropDownMenu() {
 //create a dropdown variable to provide the id options
     let dropDown = d3.select("#selDataset");
-// when subject id dropdown is changed, call function
-    d3.selectAll("#selDataset").on("change", optionChanged);
 
     // save all available ids
     dataAccess.then((data) => {
@@ -29,52 +28,82 @@ function dropDownMenu() {
     let id = ids[0];
 
     console.log(id);
-
+    
     //default display visuals with first selected id
      barChart(id);
-    //bubbleChart(id);
+     bubbleChart(id);
     //metaData(id);
     });
 }
 
 //create bar chart function
-function barChart(choice) {
+function barChart(id) {
     
-    //filter to only the data from the chosen id
-    let testSubject = dataAccess.filter(data.samples == choice)
+    dataAccess.then(data => {
 
-    //sort by from biggest to smallest OTU based on sample value
-    let sortedSampleData = testSubject.sort((a, b) => b.sample_values - a.sample_values);
+        //filter to only the data from the chosen id
+        filteredData = data.samples.filter(sample => sample.id === id);
+        console.log(filteredData);
 
-    //Choose only the top 10 OTUs
-    let topTen = sortedSampleData.slice(0,10);
+        //sort by from biggest to smallest OTU based on sample value
+        sortedSampleData = filteredData.sort((a, b) => b.sample_values - a.sample_values);
+        console.log(sortedSampleData);
 
-//console log to check that the top 10 were correctly selected
-    console.log(topTen);
+        //Choose only the top 10 OTUs
+        topTen = sortedSampleData.slice(0, 10);
+        console.log(topTen)
 
-//Set up trace for bar chart
-    trace1 = {
-       x: topTen.sample_values,
-       y: topTen.otu_ids,
-       type: "bar",
-       orientation: "h"
-             };
 
-    let barData = [trace1];
+        //Set up trace for bar chart
+        let trace1 = {
+            x: topTen.sample_values,
+            y: topTen.otu_ids,
+            text: topTen.otu_labels,
+            type: "bar",
+            orientation: "h"
+                };
+ 
+        let barData = [trace1];
+ 
+        Plotly.newPlot("bar", barData);
+    });
 
-    Plotly.updatePlot("bar", barData);
-    }
+}
+
 
 //create bubble chart function
+function bubbleChart(id) {
+
+    dataAccess.then(data => {
+        //filter to only the data from the chosen id
+        testSubject = data.samples.filter(sample => sample.id === id);
+        //set up trace for bubble chart
+        trace1 = {
+            x: testSubject.otu_ids,
+            y: testSubject.sample_values,
+            text: testSubject.otu_labels,
+            marker:{
+                size: testSubject.sample_values,
+                color: testSubject.otu_ids
+            }
+        };
+
+        let bubbleData = [trace1];
+
+        Plotly.newPlot("bubble", bubbleData);
+    });
+}
 
 //create metadata function
 
+// when subject id dropdown is changed, call function
+d3.selectAll("#selDataset").on("change", optionChanged);
+
 //create optionChanged to run whenever the chosen id is changed
-    function optionChanged(choice) {
-    barChart(choice);
-    //bubbleChart(choice);
-    //metaData(choice);
+    function optionChanged(id) {
+    barChart(id);
+    bubbleChart(id);
+    //metaData(id);
     }
 
-
-
+dropDownMenu();
