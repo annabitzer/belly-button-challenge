@@ -32,7 +32,7 @@ function dropDownMenu() {
     //default display visuals with first selected id
      barChart(id);
      bubbleChart(id);
-    //metaData(id);
+     metaData(id);
     });
 }
 
@@ -47,18 +47,18 @@ function barChart(id) {
 
         //sort by from biggest to smallest OTU based on sample value
         sortedSampleData = filteredData.sort((a, b) => b.sample_values - a.sample_values);
-        console.log(sortedSampleData);
+        console.log(sortedSampleData[0]);
 
         //Choose only the top 10 OTUs
-        topTen = sortedSampleData.slice(0, 10);
+        topTen = sortedSampleData[0].sample_values.slice(0, 10);
         console.log(topTen)
 
 
         //Set up trace for bar chart
         let trace1 = {
-            x: topTen.sample_values,
-            y: topTen.otu_ids,
-            text: topTen.otu_labels,
+            x: topTen,
+            y: sortedSampleData[0].otu_ids,
+            text: sortedSampleData[0].otu_labels,
             type: "bar",
             orientation: "h"
                 };
@@ -77,14 +77,17 @@ function bubbleChart(id) {
     dataAccess.then(data => {
         //filter to only the data from the chosen id
         testSubject = data.samples.filter(sample => sample.id === id);
+        console.log(testSubject[0])
+
         //set up trace for bubble chart
         trace1 = {
-            x: testSubject.otu_ids,
-            y: testSubject.sample_values,
-            text: testSubject.otu_labels,
+            x: testSubject[0].otu_ids,
+            y: testSubject[0].sample_values,
+            text: testSubject[0].otu_labels,
+            mode: "markers",
             marker:{
-                size: testSubject.sample_values,
-                color: testSubject.otu_ids
+                size: testSubject[0].sample_values,
+                color: testSubject[0].otu_ids
             }
         };
 
@@ -95,7 +98,25 @@ function bubbleChart(id) {
 }
 
 //create metadata function
+function metaData(id) {
+    dataAccess.then(data => {
 
+        //the test subject ids are strings, but the metadata ids are integers. Convert id to an integer.
+        let numId = parseInt(id, 10);
+
+        // Filter to only the metadata from the chosen id
+        subjectMetaData = data.metadata.filter(sample => sample.id === numId);
+        console.log(subjectMetaData);
+
+        //clear existing metadata
+        d3.select('#sample-metadata').html();
+
+        Object.entries(subjectMetaData[0]).forEach(([key, value]) => {
+            d3.select('#sample-metadata').append('p').text(`${key}: ${value}`);
+        });
+
+    });
+}
 // when subject id dropdown is changed, call function
 d3.selectAll("#selDataset").on("change", optionChanged);
 
@@ -103,7 +124,7 @@ d3.selectAll("#selDataset").on("change", optionChanged);
     function optionChanged(id) {
     barChart(id);
     bubbleChart(id);
-    //metaData(id);
+    metaData(id);
     }
 
 dropDownMenu();
