@@ -1,6 +1,8 @@
 # belly-button-challenge
 The purpose of this weekly module challenge was to create the Belly Button Biodiversity Dashboard, using the NC State Belly Button Biodiversity database (https://robdunnlab.com/projects/belly-button-biodiversity/) to create an interactive dashboard which displays information on the bacterial makeup of subjects' bellybuttons.
 
+The interactive dashboard can be found here: https://annabitzer.github.io/belly-button-challenge/
+
 Javascript and HTML were used to create the code to deploy this webpage. The d3 javascript library was used to access and create visualizations from the json data. The interactive dashboard contains the following sections:
 
     1) The test subject ID dropdown menu: This can be used to change which test subject's data is displayed, updating all other portions of the webpage. The list of available subject ids are provided to the dropdown menu using d3.
